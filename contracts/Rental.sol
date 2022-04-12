@@ -1,13 +1,23 @@
 pragma solidity ^0.5.0;
 
-import {CarLib} from "./CarLib.sol";
-
 contract Rental {
+
+    struct Car {
+        string make; // Car Model
+        bool isAvailable;  // if true, this car can be rented out
+        address rentee; // person delegated to
+        address owner; //Owner of Car
+        uint year;   // index of the voted proposal
+        string licenseNumber; // Car identification
+        uint carId; // index of car to be rented 
+    }
     
     bool private stopped = false;
+    uint totCars = 0;
     address private manager;
 
      // The constructor. We assign the manager to be the creator of the contract.It could be enhanced to support passing maangement off.
+    
     constructor() public  
     {
         manager = msg.sender;
@@ -19,29 +29,28 @@ contract Rental {
         _;
     }
     
-    //Check if the contracts features are deactivated
-    function getStopped() public view returns(bool) { return stopped; }
-
-    
-    function toggleContractActive() isAdmin public {
-    // You can add an additional modifier that restricts stopping a contract to be based on another action, such as a vote of users
-        stopped = !stopped;
-    }
 
 
     //Number of Cars available for rent
-    CarLib.Car[] public rentals;
+    Car[] public rentals;                   //*****
 
     //Return Total Number of Cars
     function getCarCount() public view returns(uint) {
+        if(totCars == rentals.length)
         return rentals.length;
+        else
+        return totCars;
     }
 
     //Renting a car 
     function rent(uint carId) public returns (bool) {
+
+        Car storage specificCar = rentals[carId];
        
        //Never Ever want to be false, therefore we use assert
        assert(!stopped); 
+
+       require(specificCar.owner != msg.sender);
         
         
        //Validate cardId is within array
@@ -51,8 +60,8 @@ contract Rental {
       require(carId >= 0 && carId < totalCars);
     
     //Reference to the car that will be rented 
-    CarLib.Car storage carToBeRented = rentals[carId];
-    
+    Car storage carToBeRented = rentals[carId];         //******
+
     //Car must be available
     require(carToBeRented.isAvailable == true);
       
@@ -67,13 +76,13 @@ contract Rental {
     }
 
     // Retrieving the car data necessary for user
-    function getRentalCarInfo(uint carId) public view returns (string memory, string memory, address, address, bool, uint, uint) {
+    function getRentalCarInfo(uint carId) public view returns (string memory make, string memory license, address owner, address rentee, bool available, uint year, uint id) {
       
       uint totalCars = getCarCount();
       require(carId >= 0 && carId < totalCars);
       
       //Get specified car 
-      CarLib.Car memory specificCar = rentals[carId];
+      Car memory specificCar = rentals[carId];
       
       //Return data considered in rental process
       return (specificCar.make,specificCar.licenseNumber, specificCar.owner ,specificCar.rentee, specificCar.isAvailable, specificCar.year , specificCar.carId);
@@ -88,12 +97,15 @@ contract Rental {
         uint count = getCarCount();
         //Increment Count
         //Construct Car Object
-        CarLib.Car memory newCar = CarLib.Car(make,true, address(0) , owner, year,licenseNumber,count);
+        Car memory newCar = Car(make,true, address(0) , owner, year,licenseNumber,count);
         
         //Add to Array
         rentals.push(newCar);
+
+        //Increment total cars 
+        totCars += 1;
         
-         return count;
+        return count;
     }
     
     //Allow Car Owner to Mark car as returned
@@ -101,7 +113,7 @@ contract Rental {
         assert(!stopped); 
         
         //Get Specific car
-        CarLib.Car storage specificCar = rentals[carId];
+        Car storage specificCar = rentals[carId];
         require(specificCar.owner == msg.sender);
         //Make car available again
         specificCar.isAvailable = true;
@@ -109,6 +121,27 @@ contract Rental {
         specificCar.rentee = address(0);
         
         //Return Success
+        return true;
+    }
+
+    function removeCar(uint carId) public returns (bool) {
+        assert(!stopped);
+
+        //Get Specific Car
+        Car storage specificCar = rentals[carId];
+        require(specificCar.owner == msg.sender && specificCar.isAvailable == true);
+        //Get total cars listed
+        uint n = getCarCount();
+        if(carId >= n) return false;
+
+        // Loop to remove car and move elements by 1
+        for(uint i = carId; i< n-1 ; i++){
+            rentals[i] = rentals[i+1];
+        }
+        
+        // Delete the car with carID
+        delete rentals[n-1];
+        totCars -=1 ;
         return true;
     }
 

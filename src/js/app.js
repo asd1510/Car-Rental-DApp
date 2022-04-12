@@ -83,6 +83,8 @@ App = {
       for (i = 0; i < count; i ++) {
         App.getCarInfo(rentalInstance,i).then(function(info) {
 
+            console.log(info);
+
             var owner = info[2];
 
             var make = info[0];
@@ -92,10 +94,11 @@ App = {
             carTemplate.find('.car-licenseNumber').text(info[1]);
             carTemplate.find('.car-isAvailable').text(info[4]);
             carTemplate.find('.car-year').text(info[5]);
-            carTemplate.find('.car-year').text(info[5]);
+            carTemplate.find('.car-owner').text(info[2]);
             carTemplate.find('.btn-rent').attr('data-id', info[6]);
             carTemplate.find('.btn-return').attr('data-id', info[6]);
             carTemplate.find('.btn-rent').attr('disabled', !isAvailable);
+            carTemplate.find('.car-rentee').text(info[3]);
             carsRow.append(carTemplate.html());
         });
       }
@@ -127,6 +130,32 @@ App = {
       }).then(function(result, account) {
 
         return App.markRented(account);
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+
+  handleDelete: function(event) {
+    event.preventDefault();
+
+    var carId = parseInt($(event.target).data('id'));
+    var rentalnInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+
+      App.contracts.Rental.deployed().then(function(instance) {
+        rentalnInstance = instance;
+
+        // Execute rent as a transaction by sending account
+        return rentalnInstance.removeCar(carId, {from: account, gas:3000000});
+      }).then(function(result) {
+        return true;
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -198,6 +227,7 @@ App = {
     $(document).on('click', '.btn-rent', App.handleRent);
     $(document).on('click', '.btn-return', App.handleReturnCar);
     $(document).on('click', '.btn-addCar', App.handleAddCar);
+    $(document).on('click', '.btn-delete', App.handleDelete);
   }
 
 

@@ -6,7 +6,7 @@
   "sourceMap": "25:454:0:-;;132:2:-1;166:7;155:9;146:7;137:37;252:7;246:14;243:1;238:23;232:4;229:33;270:1;265:20;;;;222:63;;265:20;274:9;222:63;;298:9;295:1;288:20;328:4;319:7;311:22;352:7;343;336:24",
   "deployedSourceMap": "25:454:0:-;;;;;;;;",
   "source": "pragma solidity ^0.5.0;\n\nlibrary CarLib {\n    //This library contains helps create Car Objects for Rental Contracts\n    struct Car {\n        string make; // Car Model\n        bool isAvailable;  // if true, this car can be rented out\n        address rentee; // person delegated to\n        address owner; //Owner of Car\n        uint year;   // index of the voted proposal\n        string licenseNumber; // Car identification\n        uint carId; // index of car to be rented \n    }\n}\n",
-  "sourcePath": "D:\\Car-Rental-DApp\\contracts\\CarLib.sol",
+  "sourcePath": "D:/Car-Rental-DApp/contracts/CarLib.sol",
   "ast": {
     "absolutePath": "/D/Car-Rental-DApp/contracts/CarLib.sol",
     "exportedSymbols": {
@@ -485,7 +485,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.1",
-  "updatedAt": "2022-04-11T14:31:26.105Z",
+  "updatedAt": "2022-04-12T10:41:36.416Z",
   "devdoc": {
     "methods": {}
   },
