@@ -136,31 +136,31 @@ App = {
     });
   },
 
-  handleDelete: function(event) {
-    event.preventDefault();
+  // handleDelete: function(event) {
+  //   event.preventDefault();
 
-    var carId = parseInt($(event.target).data('id'));
-    var rentalnInstance;
+  //   var carId = parseInt($(event.target).data('id'));
+  //   var rentalnInstance;
 
-    web3.eth.getAccounts(function(error, accounts) {
-      if (error) {
-        console.log(error);
-      }
+  //   web3.eth.getAccounts(function(error, accounts) {
+  //     if (error) {
+  //       console.log(error);
+  //     }
 
-      var account = accounts[0];
+  //     var account = accounts[0];
 
-      App.contracts.Rental.deployed().then(function(instance) {
-        rentalnInstance = instance;
+  //     App.contracts.Rental.deployed().then(function(instance) {
+  //       rentalnInstance = instance;
 
-        // Execute rent as a transaction by sending account
-        return rentalnInstance.removeCar(carId, {from: account, gas:3000000});
-      }).then(function(result) {
-        return true;
-      }).catch(function(err) {
-        console.log(err.message);
-      });
-    });
-  },
+  //       // Execute rent as a transaction by sending account
+  //       return rentalnInstance.removeCar(carId, {from: account, gas:3000000});
+  //     }).then(function(result) {
+  //       return true;
+  //     }).catch(function(err) {
+  //       console.log(err.message);
+  //     });
+  //   });
+  // },
 
   handleAddCar: function(event) {
     event.preventDefault();
@@ -177,7 +177,7 @@ App = {
 
       App.contracts.Rental.deployed().then(function(instance) {
         rentalnInstance = instance;
-
+        console.log(rentalnInstance)
 
         var make = document.getElementById("makeInfo").value;
         var owner = document.getElementById("owner").value;
@@ -227,7 +227,7 @@ App = {
     $(document).on('click', '.btn-rent', App.handleRent);
     $(document).on('click', '.btn-return', App.handleReturnCar);
     $(document).on('click', '.btn-addCar', App.handleAddCar);
-    $(document).on('click', '.btn-delete', App.handleDelete);
+    // $(document).on('click', '.btn-delete', App.handleDelete);
   }
 
 
